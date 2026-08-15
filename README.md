@@ -34,3 +34,7 @@ Arkusz musi być udostępniony jako **Anyone with the link / Viewer**.
 ## Automatyczna aktualizacja
 
 `.github/workflows/update-tiktok.yml` uruchamia synchronizację co 6 godzin i może być też uruchomiony ręcznie przez `Run workflow`.
+
+## Filtrowanie członków
+
+Filtr korzysta przede wszystkim z kolumny `Members` / `Członkowie` w arkuszu. Jeżeli komórka jest pusta, członkowie są rozpoznawani z opisu i hashtagów filmu. `Q` obejmuje również nazwę `Changmin`, a `NEW` obejmuje również `Chanhee`; aliasy nie są wyświetlane w nazwach opcji. Interfejs strony jest dostępny wyłącznie po angielsku.
