@@ -11,10 +11,10 @@ ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/"data.js"
 ALLOWED={"istent_theboyz","theboyz_officl","jakeybaee2","kebean.moon","eric.sohn22"}
 ALIASES={
- "date":{"data","date","upload date","data dodania"},
+ "date":{"data","data (yymmdd)","date","upload date","data dodania"},
  "description":{"opis tiktoka","opis","description","caption"},
  "hashtags":{"hashtagi","hashtags","tags"},
- "members":{"czlonkowie","członkowie","members","member"},
+ "members":{"czlonkowie the boyz","członkowie the boyz","czlonkowie","członkowie","members","member"},
  "tiktok":{"link tiktok","link do tiktoka","tiktok url","tiktok link","tiktok"},
  "youtube":{"link youtube","link do youtube","youtube","youtube url","youtube link","link youtube shorts"},
  "drive":{"link google drive","google drive","google drive link","drive","drive link","link drive","link do google drive","link do pobrania","download link"}
@@ -45,7 +45,7 @@ def parsedate(v,id_):
    try:d=datetime.utcfromtimestamp(int(id_)>>32)
    except Exception:pass
  return (d.strftime("%Y-%m-%d"),d.year,d.strftime("%y%m%d")) if d else ("",0,"")
-def memberlist(v):return [x.strip() for x in re.split(r"[,;/|]+",str(v or "")) if x.strip()]
+def memberlist(v):return [x.strip() for x in re.split(r"[,;/|\n]+",str(v or "")) if x.strip()]
 
 def main():
  req=urllib.request.Request(URL,headers={"User-Agent":"tbzarchive-github-sync/3.0"})
@@ -61,6 +61,8 @@ def main():
    if "tiktok" in c:
     header_i=i;cmap=c;break
   if header_i is None:continue
+  if "members" not in cmap:
+   raise RuntimeError(f"Missing 'Członkowie THE BOYZ' column in {ws.title}. data.js was not changed.")
   for row in rows[header_i+1:]:
    def get(k):
     i=cmap.get(k);return cell_value(row[i]) if i is not None and i<len(row) else ""

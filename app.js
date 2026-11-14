@@ -31,16 +31,16 @@ const COPY = {
 const MEMBER_OPTIONS = [
   { value: "Sangyeon", aliases: ["sangyeon", "상연"] },
   { value: "Jacob", aliases: ["jacob", "제이콥"] },
-  { value: "Younghoon", aliases: ["younghoon", "영훈"] },
+  { value: "Younghoon", aliases: ["younghoon", "영훈", "김영훈"] },
   { value: "Hyunjae", aliases: ["hyunjae", "현재"] },
   { value: "Juyeon", aliases: ["juyeon", "주연"] },
   { value: "Kevin", aliases: ["kevin", "케빈"] },
-  { value: "Q", aliases: ["q", "changmin", "창민", "큐"], contentAliases: ["changmin", "창민", "큐"], hashtagAliases: ["q", "changmin"] },
+  { value: "Q", aliases: ["q", "changmin", "창민", "큐"] },
   { value: "Sunwoo", aliases: ["sunwoo", "선우"] },
   { value: "Eric", aliases: ["eric", "에릭"] },
   { value: "Hwall", aliases: ["hwall", "hyunjun", "hur hyunjun", "활", "허현준", "현준"] },
   { value: "Haknyeon", aliases: ["haknyeon", "ju haknyeon", "학년", "주학년"] },
-  { value: "New", aliases: ["new", "chanhee", "choi chanhee", "뉴", "찬희", "최찬희"], contentAliases: ["chanhee", "choi chanhee", "뉴", "찬희", "최찬희"], hashtagAliases: ["new", "chanhee"] }
+  { value: "New", aliases: ["new", "chanhee", "choi chanhee", "뉴", "찬희", "최찬희"] }
 ];
 
 const state = { account: "all", member: "all", year: "all", sort: "newest", shown: PAGE_SIZE };
@@ -91,28 +91,18 @@ function driveDownload(url) {
   return match ? `https://drive.google.com/uc?export=download&id=${encodeURIComponent(match[1])}` : source;
 }
 
-function containsAlias(text, aliases) {
-  const normalizedText = normalizeWords(text);
-  return aliases.some((alias) => normalizedText.includes(normalizeWords(alias)));
-}
-
-function hasHashtag(text, aliases) {
-  const hashtags = [...String(text || "").matchAll(/#([\p{L}\p{N}_-]+)/gu)].map((match) => normalizeWords(match[1]));
-  return aliases.some((alias) => hashtags.includes(normalizeWords(alias)));
-}
-
 function memberMatches(video, selectedMember) {
   if (selectedMember === "all") return true;
   const option = MEMBER_OPTIONS.find((member) => member.value === selectedMember);
   if (!option) return false;
 
+  // Only the spreadsheet's "Członkowie THE BOYZ" column defines membership.
   const explicitMembers = members(video.members);
-  if (explicitMembers.some((member) => /^all members$/i.test(member))) return true;
-  if (explicitMembers.some((member) => containsAlias(member, option.aliases))) return true;
-
-  const content = `${video.description || ""} ${video.hashtags || ""}`;
-  const contentAliases = option.contentAliases || option.aliases;
-  return containsAlias(content, contentAliases) || hasHashtag(video.hashtags, option.hashtagAliases || []);
+  return explicitMembers.some((member) => {
+    const normalized = normalizeWords(member).trim();
+    if (normalized === "all members" || normalized === "the boyz") return true;
+    return option.aliases.some((alias) => normalized === normalizeWords(alias).trim());
+  });
 }
 
 function filtered() {
